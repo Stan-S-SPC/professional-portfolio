@@ -1,0 +1,31 @@
+# Copy this file to config.yaml (which is gitignored) and fill in your details.
+
+# Application (client) ID of the Azure AD app registration created for this
+# tool. See README.md -> "Register an Azure AD app" for the one-time setup.
+client_id: "00000000-0000-0000-0000-000000000000"
+
+# Use "consumers" for a personal Microsoft/OneDrive account (the usual case
+# for a personal Obsidian vault), "organizations" for a work/school account
+# tied to your own tenant, or "common" to allow either.
+tenant: "consumers"
+
+# Path to the folder in OneDrive to sync, relative to the OneDrive root.
+remote_folder: "journaldebord"
+
+# Path to the local Obsidian vault folder on this device to keep in sync
+# with remote_folder. On Android under Termux this is typically somewhere
+# under ~/storage/shared/ (see README.md).
+local_vault_path: "~/storage/shared/Obsidian/journaldebord"
+
+# Where this tool keeps track of what was last synced, and the cached
+# Graph API token. Both are gitignored; leave as-is unless you need
+# multiple independent sync configs on the same machine.
+state_file: ".sync_state.json"
+token_cache_file: ".token_cache.json"
+
+# What to do when the same file was changed on both sides since the last
+# sync. "keep-both" is the only strategy implemented: it renames the local
+# edit aside as "<name> (conflict <timestamp>).md", restores the original
+# path from OneDrive's version, and uploads the renamed copy too, so
+# nothing is silently lost.
+conflict_strategy: "keep-both"
