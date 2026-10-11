@@ -161,4 +161,5 @@ venv/
 config.yaml
 .token_cache.json
 .sync_state.json
+local_mirror.conf
 

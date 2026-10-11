@@ -1,7 +1,7 @@
 # OneDrive ↔ Obsidian Sync
 
-Bidirectional, conflict-aware synchronization between a folder in OneDrive
-(e.g. `journaldebord`) and a local [Obsidian](https://obsidian.md) vault,
+Bidirectional synchronization between a folder in OneDrive (e.g.
+`journaldebord`) and a local [Obsidian](https://obsidian.md) vault,
 designed to run unattended on Android (via [Termux](https://termux.dev/))
 or on a desktop, on a schedule or on demand.
 
@@ -10,11 +10,26 @@ or on a desktop, on a schedule or on demand.
 Obsidian's own sync is a paid add-on, and pointing Obsidian straight at a
 OneDrive-synced folder on Android is unreliable because OneDrive's
 "available offline" files aren't always visible to other apps in real
-time. This tool talks to the [Microsoft Graph API](https://learn.microsoft.com/graph/)
-directly instead, so it controls exactly when files move and how
-conflicts are handled.
+time.
 
-## How it works
+There are two ways to solve that in this repo:
+
+- **Option A — `onedrive_obsidian_sync` (Python, Microsoft Graph API).**
+  Talks to OneDrive directly, so it controls exactly when files move and
+  resolves conflicts explicitly (keep-both, nothing silently lost). Needs
+  a one-time Azure app registration and an OAuth login.
+- **Option B — `scripts/local_mirror_sync.sh` (shell, `rsync`).** No
+  Microsoft account or app registration at all: it relies on the OneDrive
+  Android app to handle the actual cloud sync, and just mirrors OneDrive's
+  local copy of the folder with your Obsidian vault folder using
+  last-modified-wins. Much simpler, but doesn't propagate deletions (see
+  its section below) and has no real conflict handling.
+
+Start with **Option B** if you just want something working quickly;
+move to **Option A** if you want proper conflict handling or don't want
+to rely on the OneDrive app's own local caching behavior.
+
+## Option A: Graph API sync — how it works
 
 ```
 onedrive_obsidian_sync/
@@ -45,7 +60,7 @@ restored on both sides.
 without mocking anything (`tests/test_plan_sync.py`); `tests/test_sync_integration.py`
 exercises `run()` end-to-end against an in-memory fake of the Graph API.
 
-## Setup
+## Option A: setup
 
 ### 1. Register an Azure AD app (one-time)
 
@@ -108,7 +123,7 @@ This prints a short code and a URL. Open the URL on any device, sign in,
 and enter the code. The resulting token is cached in `.token_cache.json`
 (gitignored) and refreshed automatically afterwards.
 
-## Usage
+### Usage
 
 ```bash
 python -m onedrive_obsidian_sync sync     # run one sync pass now
@@ -136,7 +151,7 @@ crontab -e
 run `python -m onedrive_obsidian_sync sync` with the working directory set
 to the repo.
 
-## Known limitations
+### Known limitations
 
 - Simple upload only, so individual files over 4 MB (unusual for Markdown
   notes, possible for embedded images/attachments) aren't supported.
@@ -145,9 +160,68 @@ to the repo.
   for very large vaults.
 - One conflict strategy (keep-both); it isn't configurable per-file.
 
-## Running the tests
+### Running the tests
 
 ```bash
 pip install -r requirements-dev.txt
 pytest
 ```
+
+## Option B: simple local mirror
+
+This just mirrors two local folders with `rsync`, relying on the OneDrive
+Android app to do the actual cloud sync. No code to install beyond
+`rsync`, no login.
+
+### 1. Find OneDrive's local folder on your phone
+
+In the OneDrive app, mark `journaldebord` as "Always keep on this
+device" (or "Available offline"). Then, in Termux, look for it under:
+
+```bash
+find ~/storage/shared -iname journaldebord -type d 2>/dev/null
+```
+
+It's commonly under something like
+`~/storage/shared/Android/media/com.microsoft.skydrive/OneDrive/journaldebord`
+— the exact path depends on your OneDrive app version. If `find` turns up
+nothing, open the OneDrive app's own file browser, use its "share" or
+"open with" action on a file inside the folder, and check what path a
+file manager app shows for it.
+
+### 2. Configure
+
+```bash
+cp local_mirror.conf.example local_mirror.conf
+```
+Edit `local_mirror.conf` (gitignored) and set `ONEDRIVE_DIR` to the path
+found above, and `VAULT_DIR` to your Obsidian vault folder (e.g.
+`~/storage/shared/Obsidian/journaldebord`).
+
+### 3. Run it
+
+```bash
+bash scripts/local_mirror_sync.sh   # manual trigger any time
+```
+
+Schedule it the same way as Option A:
+```bash
+crontab -e
+# every 15 minutes:
+*/15 * * * * bash ~/professional-portfolio/scripts/local_mirror_sync.sh >> ~/professional-portfolio/mirror.log 2>&1
+```
+Or add a [Termux:Widget](https://wiki.termux.com/wiki/Termux:Widget)
+shortcut to `scripts/local_mirror_sync.sh` for a one-tap sync button.
+
+### Known limitations
+
+- **Deletions aren't propagated.** Delete a note on one side and the next
+  run just recopies it back from the other side — delete it on both sides
+  by hand, or switch to Option A.
+- **No real conflict detection.** If the same file is edited on both sides
+  between two runs, whichever copy has the newer modification time wins
+  and the other edit is lost. Fine for a journal one person edits from one
+  device at a time; risky if you edit the same note from two devices
+  around the same time.
+- Depends on the OneDrive app's own sync actually having pulled the
+  latest cloud version into its local folder before this script runs.
