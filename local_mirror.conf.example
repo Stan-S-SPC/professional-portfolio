@@ -1,0 +1,13 @@
+# Copy this file to local_mirror.conf (gitignored) and fill in your paths.
+# Used by scripts/local_mirror_sync.sh.
+
+# The folder where the OneDrive Android app keeps its local copy of
+# "journaldebord" once it's marked "Always keep on this device"/"Available
+# offline". The exact path depends on your OneDrive app version and Android
+# version -- see README.md -> "Option B: simple local mirror" for how to
+# find it. It commonly looks like:
+#   ONEDRIVE_DIR="$HOME/storage/shared/Android/media/com.microsoft.skydrive/OneDrive/journaldebord"
+ONEDRIVE_DIR="$HOME/storage/shared/REPLACE_ME/journaldebord"
+
+# Your Obsidian vault folder on this device.
+VAULT_DIR="$HOME/storage/shared/Obsidian/journaldebord"
