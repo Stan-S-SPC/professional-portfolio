@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "m365": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@softeria/ms-365-mcp-server",
+        "--org-mode",
+        "--enabled-tools",
+        "drive|onedrive|file|excel|word|powerpoint"
+      ],
+      "env": {
+        "MS365_MCP_CLIENT_ID": "${MS365_MCP_CLIENT_ID:-}",
+        "MS365_MCP_TENANT_ID": "${MS365_MCP_TENANT_ID:-common}"
+      }
+    }
+  }
+}
