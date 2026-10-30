@@ -1,0 +1,9 @@
+{
+  "id": "pixel-quest",
+  "name": "Pixel Quest",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.7",
+  "description": "Habit tracker RPG en pixel art : classes, compétences, boss hebdomadaires, et un journal qui alimente ton second brain.",
+  "author": "Stan-S-SPC",
+  "isDesktopOnly": false
+}

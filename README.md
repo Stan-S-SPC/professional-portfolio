@@ -79,3 +79,13 @@ au lieu d'être écrasée.
   dédié) : barres à une seule teinte, rampe séquentielle bleue pour la carte de régularité, info-bulles au
   survol, au toucher et au focus, et vue « Tableau » pour chaque graphique.
 - `prefers-reduced-motion` désactive confettis et animations.
+
+---
+
+## ⚔️ Pixel Quest — la version RPG pour Obsidian
+
+Habit Quest ci-dessus est une page web autonome. Pour un usage quotidien branché sur ton second brain, le dossier
+[`pixel-quest/`](pixel-quest) contient **Pixel Quest**, un plugin Obsidian (ordinateur et mobile) : classes, compétences,
+héros et boss en pixel art, et des habitudes stockées comme notes Markdown (quêtes, journal, revues, tableau de bord)
+lisibles par toi et par un agent. Installation et détails : [pixel-quest/README.md](pixel-quest/README.md).
+
