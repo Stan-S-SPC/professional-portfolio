@@ -133,8 +133,11 @@ src/obsidian/  adaptateurs Obsidian (coffre, modales, vue, réglages) + src/main
 
 ### Publier une version
 
-Mets à jour `version` dans `manifest.json` et `package.json`, lance `npm run build`, committe `dist/`, puis
-`git tag X.Y.Z && git push origin X.Y.Z` : le workflow `pixel-quest-release.yml` crée le release (assets pour BRAT).
+Mets à jour `version` dans `manifest.json` et `package.json`, lance `npm run build` et committe `dist/`. Puis crée un
+release GitHub avec un tag `X.Y.Z` identique à la version du manifeste (ou `git tag X.Y.Z && git push origin X.Y.Z`) :
+le workflow `pixel-quest-release.yml` construit le plugin et **joint `main.js`, `manifest.json` et `styles.css`** au
+release, qu'il l'ait créé lui-même ou non. Pour un release déjà publié sans fichiers : onglet *Actions* →
+*Pixel Quest — release* → *Run workflow* → tag `X.Y.Z`.
 
 ## Licences
 

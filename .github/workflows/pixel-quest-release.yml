@@ -1,11 +1,18 @@
 name: Pixel Quest — release
 
-# Publier une version : `git tag 0.1.0 && git push origin 0.1.0`
-# Le numéro de tag doit être celui de pixel-quest/manifest.json. Les fichiers du release
-# (main.js, manifest.json, styles.css) permettent l'installation via BRAT.
+# Publier une version : créer un release GitHub avec un tag X.Y.Z, ou `git tag X.Y.Z && git push origin X.Y.Z`.
+# Le numéro doit être celui de pixel-quest/manifest.json. Le workflow construit le plugin et joint
+# main.js, manifest.json et styles.css au release (en le créant s'il n'existe pas) : ces fichiers
+# permettent l'installation via BRAT. Il peut aussi être lancé à la main (Actions → Run workflow)
+# pour joindre les fichiers à un release déjà publié.
 on:
   push:
     tags: ["[0-9]+.[0-9]+.[0-9]+"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag du release auquel joindre les fichiers (ex. 0.1.0)"
+        required: true
 
 jobs:
   release:
@@ -17,6 +24,8 @@ jobs:
         working-directory: pixel-quest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -27,18 +36,25 @@ jobs:
       - run: npm test
       - run: npm run build
       - name: Vérifier que le tag correspond à la version du manifeste
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
           VERSION=$(node -p "require('./manifest.json').version")
-          if [ "$VERSION" != "${GITHUB_REF_NAME}" ]; then
-            echo "Le tag (${GITHUB_REF_NAME}) ne correspond pas à la version du manifeste ($VERSION)."
+          if [ "$VERSION" != "${TAG}" ]; then
+            echo "Le tag (${TAG}) ne correspond pas à la version du manifeste ($VERSION)."
             exit 1
           fi
       - name: Vérifier que le build versionné (dist/) correspond aux sources
         run: git diff --exit-code -- dist
-      - name: Créer le release
+      - name: Joindre les fichiers au release (le créer s'il n'existe pas)
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" dist/main.js dist/manifest.json dist/styles.css \
-            --title "Pixel Quest ${GITHUB_REF_NAME}" \
-            --notes "Plugin Obsidian Pixel Quest ${GITHUB_REF_NAME}. Installation : voir pixel-quest/README.md (à la main ou via BRAT)."
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release upload "${TAG}" dist/main.js dist/manifest.json dist/styles.css --clobber
+          else
+            gh release create "${TAG}" dist/main.js dist/manifest.json dist/styles.css \
+              --title "Pixel Quest ${TAG}" \
+              --notes "Plugin Obsidian Pixel Quest ${TAG}. Installation : voir pixel-quest/README.md (à la main ou via BRAT)."
+          fi
