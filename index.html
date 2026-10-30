@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#1c5cab" />
+    <meta name="description" content="Habit Quest : un habit tracker gamifié pour progresser dans votre vie professionnelle — XP, séries, niveaux et succès." />
+    <title>Habit Quest — habit tracker pro</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚔️%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#view">Aller au contenu</a>
+
+    <div class="app">
+      <header class="hero" id="hero"></header>
+
+      <nav class="tabs" id="tabs" aria-label="Navigation principale"></nav>
+
+      <main id="view" tabindex="-1"></main>
+    </div>
+
+    <dialog id="modal" aria-labelledby="modal-title"></dialog>
+    <!-- Popovers « manual » : rendus dans la couche supérieure, donc visibles au-dessus des modales. -->
+    <div id="toasts" class="toasts" popover="manual"></div>
+    <div id="fx" class="fx" popover="manual" aria-hidden="true"></div>
+    <div id="live" class="sr-only" role="status" aria-live="polite"></div>
+    <div id="tooltip" class="tooltip" hidden></div>
+
+    <noscript><p class="noscript">Habit Quest a besoin de JavaScript pour fonctionner.</p></noscript>
+
+    <script src="js/core.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
