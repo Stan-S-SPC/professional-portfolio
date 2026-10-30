@@ -1,0 +1,44 @@
+name: Pixel Quest — release
+
+# Publier une version : `git tag 0.1.0 && git push origin 0.1.0`
+# Le numéro de tag doit être celui de pixel-quest/manifest.json. Les fichiers du release
+# (main.js, manifest.json, styles.css) permettent l'installation via BRAT.
+on:
+  push:
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: pixel-quest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: pixel-quest/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Vérifier que le tag correspond à la version du manifeste
+        run: |
+          VERSION=$(node -p "require('./manifest.json').version")
+          if [ "$VERSION" != "${GITHUB_REF_NAME}" ]; then
+            echo "Le tag (${GITHUB_REF_NAME}) ne correspond pas à la version du manifeste ($VERSION)."
+            exit 1
+          fi
+      - name: Vérifier que le build versionné (dist/) correspond aux sources
+        run: git diff --exit-code -- dist
+      - name: Créer le release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" dist/main.js dist/manifest.json dist/styles.css \
+            --title "Pixel Quest ${GITHUB_REF_NAME}" \
+            --notes "Plugin Obsidian Pixel Quest ${GITHUB_REF_NAME}. Installation : voir pixel-quest/README.md (à la main ou via BRAT)."

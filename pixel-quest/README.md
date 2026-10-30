@@ -134,7 +134,7 @@ src/obsidian/  adaptateurs Obsidian (coffre, modales, vue, réglages) + src/main
 ### Publier une version
 
 Mets à jour `version` dans `manifest.json` et `package.json`, lance `npm run build`, committe `dist/`, puis
-`git tag X.Y.Z && git push origin X.Y.Z` : le workflow GitHub crée le release (assets pour BRAT).
+`git tag X.Y.Z && git push origin X.Y.Z` : le workflow `pixel-quest-release.yml` crée le release (assets pour BRAT).
 
 ## Licences
 
