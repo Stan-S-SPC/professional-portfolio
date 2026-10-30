@@ -147,3 +147,8 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Pixel Quest (plugin Obsidian) : fichiers générés par le build
+pixel-quest/main.js
+pixel-quest/styles.css
+pixel-quest/.test-build/
