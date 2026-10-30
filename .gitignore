@@ -147,3 +147,8 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Pixel Quest (plugin Obsidian) : le build est versionné (c'est ce qu'on copie dans le vault),
+# les sorties des tests ne le sont pas.
+!pixel-quest/dist/
+pixel-quest/.test-build/

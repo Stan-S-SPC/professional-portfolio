@@ -1,0 +1,33 @@
+name: Pixel Quest
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "pixel-quest/**"
+      - ".github/workflows/pixel-quest.yml"
+  pull_request:
+    paths:
+      - "pixel-quest/**"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pixel-quest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: pixel-quest/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - name: Construire le plugin
+        run: npm run build
+      - name: Vérifier que le build versionné (dist/) correspond aux sources
+        run: git diff --exit-code -- dist
